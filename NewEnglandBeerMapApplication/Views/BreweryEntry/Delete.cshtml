@@ -1,0 +1,88 @@
+﻿@model NewEnglandBeerMapApplication.Models.CraftBreweries
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>CraftBreweries</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryAddress)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryCity)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryCity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryState)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryState)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryZipCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryZipCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.latitude)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.latitude)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.longitude)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.longitude)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryWebsite)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryWebsite)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

@@ -1,0 +1,248 @@
+﻿@model NewEnglandBeerMapApplication.Models.ContactForm
+@{
+    ViewBag.Title = "New England Craft Brewery Locator";
+    Layout = "~/Views/Shared/_MapLayout.cshtml";
+}
+
+<div ng-controller="googleMapCtrl">
+    <div class="spinner-container" ng-show="loading">
+        <div class="spinner">
+            <img src="~/Content/loading.gif" width="60" />
+        </div>        
+    </div>
+    <div id="map">
+        <!-- Google Map -->
+        <ng-map zoom="7" center="43.8992496, -71.6135105"
+                street-view-control="false"
+                map-type-control="false"
+                pan-control="true"
+                zoom-control="true"
+                scale-control="true">
+            <traffic-layer></traffic-layer>
+            <marker ng-repeat="marker in markers" id="m{{marker.Id}}"
+                    icon="{{customMarker.icon}}"
+                    title="{{marker.BreweryName}}"
+                    position="{{marker.latitude}}, {{marker.longitude}}" on-click="showInfo(event, marker)">
+            </marker>
+            <info-window id="currentWindow" visible="false">
+                <div>
+                    <b>{{currentmarker.BreweryName}}</b><br />
+                    {{currentmarker.BreweryAddress}}<br />
+                    {{currentmarker.BreweryCity}}, {{currentmarker.BreweryState}} {{currentmarker.BreweryZipCode}}<br />
+                    <a target="_blank" href="http://{{currentmarker.BreweryWebsite}}">Website</a><br />
+                    <a target="_blank" href="https://maps.google.com/maps?q={{currentmarker.BreweryAddress}}+{{currentmarker.BreweryCity}}+{{currentmarker.BreweryState}}+{{currentmarker.BreweryZipCode}}">Get Directions</a>
+                </div>
+            </info-window>
+        </ng-map>
+    </div>
+    <div id="interface">
+        <h3>The New England Craft Brewery Locator</h3>        
+        <div id="inner-menu">
+            <select class="form-control" ng-model="selectedState" ng-class="{ 'selected':selectedState }" ng-change="stateZoom(selectedState)" data-toggle="tooltip" data-placement="top" title="Filter by state. Will only show breweries from the state selected.">
+                <option default value="">All New England</option>
+                <option value="CT">Connecticut</option>
+                <option value="ME">Maine</option>
+                <option value="MA">Massachusetts</option>
+                <option value="NH">New Hampshire</option>
+                <option value="RI">Rhode Island</option>
+                <option value="VT">Vermont</option>
+            </select>
+            <!-- "Search by Brewery Name" Search Bar -->
+            <div class="outer-searchbar">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search by Brewery" ng-model="inputBrewery">
+                    <span class="input-group-btn">
+                        <button class="btn btn-search" data-toggle="tooltip" data-placement="top" title="Search from those breweries displayed">
+                            <span ng-hide="inputBrewery.length >= 2" class="glyphicon glyphicon-search"></span>
+                            <span ng-show="inputBrewery.length >= 2" ng-click="inputBrewery = ''" class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <!-- List of Breweries -->
+            <div class="scrollmenu-container">
+                <ul class="list-group scrollmenu">
+                    <li class="list-group-item" ng-repeat="marker in markers | filterByState:selectedState:markers |orderBy:'BreweryName' | filter:filterBrewery" id="{{marker.Id}}" ng-click="markerZoom(marker)">
+                        {{marker.BreweryName}}
+                    </li>
+                </ul>
+            </div>
+            <footer>
+                <div class="row">
+                    <div class="col-md-11 text-center">
+                        <p class="center-block">
+                            <a href="#" data-toggle="modal" data-target="#aboutModal">About</a>                            
+                            <span>&nbsp;&nbsp;</span>
+                            <a href="#" data-toggle="modal" data-target="#contactModal">Contact</a>
+                        </p>
+                        <p class="center-block copyright">
+                            &copy; @DateTime.Now.Year - Matthew Dailey
+                        </p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        <div class="mobile-button">
+            <div id="mobile-btn">
+                <div id="hidemenu"><span class="glyphicon glyphicon-chevron-up"></span><p>Hide Menu</p></div>
+                <div id="showmenu"><span class="glyphicon glyphicon-chevron-down"></span><p >Show Menu</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About Modal -->
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">About</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>
+                                This web application was an opportunity to combine two of my passions, craft breweries and web development. My aim was to make a useful app for
+                                discovering New England-based craft breweries. Other webpages list the craft breweries in a particular state and none of them had a good user interface.
+                                Often the pages would be just an article accompanied by a small map of breweries. Some pages would only show what the writer thought were the 'top' breweries in a particular
+                                state.
+                            </p>
+                            <p>
+                                With no craft brewery API to utilize, I created my own MySQL database and populated with breweries that met the following criteria:
+                                <ul>
+                                    <li>They are craft brewery as defined by the American Brewers Association with annual production of 6 million barrels of beer or less.</li>
+                                    <li>Their production facility is located in New England.</li>
+                                </ul>
+                                I envision a scenario where after buying a six-pack of a New England brewery for the first time, a craft beer fan
+                                heads to the app and finds out where the brewery is located, checks out the website, and plans a visit.
+                            </p>
+                            <p>
+                                <strong>Sources</strong><br />
+                                Massachusetts Craft Breweries - Mass.Gov<br /> (<a target="_blank" href="http://www.mass.gov/agr/massgrown/culinary_tourism/brewery_tours.htm">http://www.mass.gov/agr/massgrown/culinary_tourism/brewery_tours.htm</a>)<br />
+                                NH Magazine - NH Breweries<br /> (<a target="_blank" href="http://www.nhmagazine.com/Breweries/index.php/category/Breweries/">http://www.nhmagazine.com/Breweries/index.php/category/Breweries/</a>)<br />
+                                Wikipedia - List of breweries in Rhode Island<br /> (<a target="_blank" href="https://en.wikipedia.org/wiki/List_of_breweries_in_Rhode_Island#Breweries">https://en.wikipedia.org/wiki/List_of_breweries_in_Rhode_Island#Breweries</a>)<br />
+                                VTBeer.org - Breweries<br /> (<a target="_blank" href="https://www.vtbeer.org/breweries/">https://www.vtbeer.org/breweries/</a>)
+                            </p>
+                        </div>
+                    </div>                    
+                </div>                 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>               
+            </div>
+        </div>
+    </div>
+</div>
+<!--Contact Modal -->
+<div class="modal fade" id="contactModal" ng-controller="popupContactFormCtrl" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">                
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <!-- The loading message during the AJAX call -->
+                <div id="loading-area" class="load" ng-show="formsending">
+                    <div class='alert alert-info'><strong>Sending...</strong></div>
+                </div>
+                <!-- The message displayed after the AJAX call -->
+                <div id="message-area" ng-show="submitmessage" >
+                    <div ng-bind-html="submitmessage" ng-class="messagesent ? 'alert alert-success' : 'alert alert-danger' ">
+                        {{ submitmessage }}
+                    </div>
+                </div>
+                <div class="contactform">
+                    <p>
+                        Have suggestions or feedback?<br />Please use the form below. All fields are required.
+                    </p>
+                    <form name="popupContact" id="contactForm" novalidate ng-submit="processForm()">
+                        <div class="form-group" ng-class="{ 'has-error' : (popupContact.contactEmail.$invalid && popupContact.contactEmail.$touched) || (popupContact.contactEmail.$invalid && submitted) || (popupContact.contactEmail.$error.minlength && popupContact.contactEmail.$dirty) }">
+                            <input name="contactEmail" type="email" class="form-control" placeholder="Email" ng-model="contactfields.contactEmail" 
+                                   ng-required="true" maxlength="300" />
+                            <p ng-show="popupContact.contactEmail.$invalid && submitted" class="help-block">Email is required.</p>
+                            <p ng-show="popupContact.contactEmail.$invalid && popupContact.contactEmail.$touched && !submitted" class="help-block">Email is required.</p>
+                            <p ng-show="popupContact.contactEmail.$error.email && popupContact.contactEmail.$dirty" class="help-block">Please enter a valid Email.</p>
+                            <p ng-show="popupContact.contactEmail.$error.maxlength" class="help-block">Email is too long.</p>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : (popupContact.contactFirstName.$invalid && popupContact.contactFirstName.$touched) || (popupContact.contactFirstName.$invalid && submitted) || (popupContact.contactFirstName.$error.minlength && popupContact.contactFirstName.$dirty) }">
+                            <input name="contactFirstName" type="text" class="form-control" placeholder="First Name" ng-model="contactfields.contactFirstName"
+                                   ng-required="true" maxlength="200" />
+                            <p ng-show="popupContact.contactFirstName.$invalid && submitted" class="help-block">First name is required.</p>
+                            <p ng-show="popupContact.contactFirstName.$invalid && popupContact.contactFirstName.$touched && !submitted" class="help-block">First name is required.</p>
+                            <p ng-show="popupContact.contactFirstName.$error.maxlength" class="help-block">First name is too long.</p>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : (popupContact.contactLastName.$invalid && popupContact.contactLastName.$touched) || (popupContact.contactLastName.$invalid && submitted) || (popupContact.contactLastName.$error.minlength && popupContact.contactLastName.$dirty) }">
+                            <input name="contactLastName" type="text" class="form-control" placeholder="Last Name" ng-model="contactfields.contactLastName"
+                                   ng-required="true" ng-minlength="3" maxlength="200" />
+                            <p ng-show="popupContact.contactLastName.$invalid && submitted" class="help-block">Last name is required.</p>
+                            <p ng-show="popupContact.contactLastName.$invalid && popupContact.contactLastName.$touched && !submitted" class="help-block">Last name is required.</p>
+                            <p ng-show="popupContact.contactLastName.$error.minlength && popupContact.contactLastName.$dirty" class="help-block">Last name is too short.</p>
+                            <p ng-show="popupContact.contactLastName.$error.maxlength" class="help-block">Last name is too long.</p>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : (popupContact.contactComments.$invalid && popupContact.contactComments.$touched) || (popupContact.contactComments.$invalid && submitted) || (popupContact.contactComments.$error.minlength && popupContact.contactComments.$dirty) }">
+                            <textarea name="contactComments" cols="20" rows="2" class="form-control" placeholder="Type Comments Here" ng-model="contactfields.contactComments"
+                                   ng-required="true" ng-minlength="4" maxlength="700"></textarea>
+                            <p ng-show="popupContact.contactComments.$invalid && submitted" class="help-block">Comments is required.</p>
+                            <p ng-show="popupContact.contactComments.$invalid && popupContact.contactComments.$touched && !submitted" class="help-block">Comments is required.</p>
+                            <p ng-show="popupContact.contactComments.$error.minlength && popupContact.contactComments.$dirty" class="help-block">Comments is too short.</p>
+                            <p ng-show="popupContact.contactComments.$error.maxlength" class="help-block">Comments is too long.</p>
+                        </div>
+                        <div class="form-group">                                                    
+                            <div vc-recaptcha
+                                 theme="'light'"
+                                 ng-model="contactfields.gRecaptchaResponse"
+                                 key="'6LfLNxgTAAAAAC32rClXM_xGH1ylPfHlAaFY-YBL'"
+                            ></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="bg-warning" ng-show="grecaptcharesponse">{{ grecaptcharesponse }}</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>                          
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+        $(window).resize(function () {
+            var windowWidth = $(window).width();
+            if (windowWidth < 768) {
+                $('#inner-menu').hide();
+                $('.mobile-button').show();
+                $('#showmenu').show();
+            } else {
+                $('#inner-menu').show();
+                $('.mobile-button').hide();
+            }
+        });
+
+        $(window).on('load', function () {
+            var windowWidth = $(window).width();
+            if (windowWidth < 768) {
+                $('#inner-menu').hide();
+                $('.mobile-button').show();
+                $('#showmenu').show();
+            } else {
+                $('#inner-menu').show();
+                $('.mobile-button').hide();
+            }
+        });
+
+        $(document).ready(function () {
+            $('#mobile-btn').click(function () {
+                var $menu = $('#inner-menu');
+                $menu.toggle("fast", function() {
+                    if ($menu.is(':visible')) {
+                        $('#hidemenu').show();
+                        $('#showmenu').hide();
+                    } else {
+
+                        $('#hidemenu').hide();
+                        $('#showmenu').show();
+                    }
+                });                
+            });
+        });
+    </script>    
+}

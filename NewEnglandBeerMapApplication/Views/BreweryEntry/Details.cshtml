@@ -1,0 +1,82 @@
+﻿@model NewEnglandBeerMapApplication.Models.CraftBreweries
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>CraftBreweries</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryAddress)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryCity)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryCity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryState)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryState)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryZipCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryZipCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.latitude)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.latitude)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.longitude)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.longitude)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BreweryWebsite)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BreweryWebsite)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
